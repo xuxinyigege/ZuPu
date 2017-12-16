@@ -1,0 +1,110 @@
+#include<QTextStream>
+void FileOperate :: FileSave(Tree *tr){
+        if(tr!=NULL){
+            QFile file("member.txt");
+            file.open(QFile::WriteOnly);
+            QTextStream ts(&file);
+            ts.setCodec("utf-8");
+        
+        ts<<(tr->self.father_name)<<endl; 
+        ts<<(tr->name)<<endl;
+        ts<<(tr->self.Sex)<<endl;
+        ts<<(tr->self.IsLife)<<endl;
+        ts<<(tr->self.generation)<<endl;
+        ts.flush();
+        file.close();
+        
+        save(tr->left);
+        save(tr->right);
+            
+              
+        }
+       
+}
+
+void FileOperate :: FileClean(){
+    QFile file("member.txt");
+    file.open(QFile::Truncate);
+    file.close();
+}
+
+Tree* FileOperate :: FileRead(){
+    queue<Tree* > q;
+    Tree *tr;
+    Tree *q_t;
+    Tree *tr_t;
+    QFile file("member.txt");
+    if(file.open(QFile::ReadOnly)){
+        QTextStream ts(&file);
+        QString line;
+        tr=new(Tree);
+        if((line=ts.readLine())!=NULL)
+             tr->self.father_name=line;
+        if((line=ts.readLine())!=NULL)
+             tr->name=line;
+        if((line=ts.readLine())!=NULL) 
+             tr->self.Sex=line;
+        if((line=ts.readLine())!=NULL){
+            if(line=="0")
+                tr->self.IsLife=0;
+            else
+                tr->self.IsLife=1;
+         }
+        if((line=ts.readLine())!=NULL) {
+            stringstream s(line);
+            s>>tr->self.generation;
+        }
+            
+    q.push(tr);
+    line=ts.readLine();
+    while(!ts.stEnd()){
+    
+            tr_t=new(Tree);
+        
+            tr_t->self.father_name=line;
+            if((line=ts.readLine())!=NULL)
+                 tr->name=line;
+            if((line=ts.readLine())!=NULL) 
+                 tr->self.Sex=line;
+            if((line=ts.readLine())!=NULL){
+                if(line=="0")
+                    tr->self.IsLife=0;
+                else
+                    tr->self.IsLife=1;
+             }
+            if((line=ts.readLine())!=NULL) {
+                stringstream s(line);
+                s>>tr->self.generation;
+            }
+            line=ts.redLine();
+
+    if(tr_t->self.father_name==q.back()->name)
+    {
+        q.back()->left=tr_t;
+    tr_t->father=q.back();
+    tr_t->brother=q.back();
+    q.push(tr_t);
+}
+else{
+    if(q.back()->self.generation>Max_Generation)
+            Max_Generation=q.back()->self.generation;
+            
+            q_t=new(Tree);
+            q_t=q.back();
+    while(q_t->self.father_name!=tr_t->self.father_name)
+        q_t=q_t->father;
+        tr_t->brother=q_t;
+    q_t->right=tr_t;
+            tr_t->father=q_t->father;
+    q.push(tr_t);
+    //delete q_t;
+}
+ //delete tr_t;
+    }
+
+    ts.flush();
+    file.close();
+    return tr;
+}
+    return 0;
+}
