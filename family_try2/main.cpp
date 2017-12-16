@@ -1,10 +1,14 @@
-#include "mainwindow.h"
 #include <QApplication>
+#include "mainmenu.h"
+#include <QMessageBox>
+#include <QSqlDatabase>
+#include <QPushButton>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+
+    MainMenu w;
     w.show();
 
     return a.exec();
