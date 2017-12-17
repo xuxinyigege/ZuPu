@@ -1,6 +1,7 @@
 #include "membersearch.h"
 #include "ui_membersearch.h"
-
+Tree *tr;
+QString familyname;
 MemberSearch::MemberSearch(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MemberSearch)
@@ -26,27 +27,26 @@ MemberSearch::MemberSearch(QWidget *parent) :
     model=new QSqlTableModel(this);
     model->setTable("member");
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    model->setHeaderData(0,Qt::Horizontal,"name");
-    model->setHeaderData(1,Qt::Horizontal,"gender");
-    model->setHeaderData(2,Qt::Horizontal,"fathername");
-    model->setHeaderData(3,Qt::Horizontal,"islive");
-    model->setHeaderData(4,Qt::Horizontal,"address");
-    model->setHeaderData(5,Qt::Horizontal,"telnumber");
-    model->setHeaderData(6,Qt::Horizontal,"generation");
-    model->removeColumns(7,7);
-
+    model->removeColumns(0,0);
+    model->setHeaderData(1,Qt::Horizontal,"name");
+    model->setHeaderData(2,Qt::Horizontal,"gender");
+    model->setHeaderData(3,Qt::Horizontal,"fathername");
+    model->setHeaderData(4,Qt::Horizontal,"islive");
+    model->setHeaderData(5,Qt::Horizontal,"address");
+    model->setHeaderData(6,Qt::Horizontal,"telnumber");
+    model->setHeaderData(7,Qt::Horizontal,"generation");
     //创建_model实现查询功能
     _model=new QSqlTableModel(this);
     _model->setTable("member");
     _model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    _model->setHeaderData(0,Qt::Horizontal,"name");
-    _model->setHeaderData(1,Qt::Horizontal,"gender");
-    _model->setHeaderData(2,Qt::Horizontal,"fathername");
-    _model->setHeaderData(3,Qt::Horizontal,"islive");
-    _model->setHeaderData(4,Qt::Horizontal,"address");
-    _model->setHeaderData(5,Qt::Horizontal,"telnumber");
-    _model->setHeaderData(6,Qt::Horizontal,"generation");
-    _model->removeColumns(7,7);
+    _model->removeColumns(0,0);
+    _model->setHeaderData(1,Qt::Horizontal,"name");
+    _model->setHeaderData(2,Qt::Horizontal,"gender");
+    _model->setHeaderData(3,Qt::Horizontal,"fathername");
+    _model->setHeaderData(4,Qt::Horizontal,"islive");
+    _model->setHeaderData(5,Qt::Horizontal,"address");
+    _model->setHeaderData(6,Qt::Horizontal,"telnumber");
+    _model->setHeaderData(7,Qt::Horizontal,"generation");
 }
 
 MemberSearch::~MemberSearch()
@@ -62,6 +62,7 @@ void MemberSearch::searchbtnSlot()
     }
     if(buttongroup->checkedId()==0)
     {
+        _model->setFilter( "familyname='"+familyname+"'");
         _model->setFilter( "name='"+ui->inputline->text()+"'");
         _model->select();
         if(_model->data(model->index(0,0)).toString().isEmpty())
@@ -100,6 +101,7 @@ void MemberSearch:: searchbrother(Tree* tr2, QString name) {
         r=t;
         while(t->brotherone != t->fatherone) {
             t=t->brotherone;
+            _model->setFilter( "familyname='"+familyname+"'");
             _model->setFilter( "name='"+t->selfname+"'");
             _model->select();
             ui->membersearchview->setModel(_model);
@@ -108,6 +110,7 @@ void MemberSearch:: searchbrother(Tree* tr2, QString name) {
 
         r=r->rightone;
         while (r != 0) {
+            _model->setFilter( "familyname='"+familyname+"'");
             _model->setFilter( "name='"+t->selfname+"'");
             _model->select();
             ui->membersearchview->setModel(_model);
@@ -120,10 +123,12 @@ void MemberSearch:: searchbrother(Tree* tr2, QString name) {
     QMessageBox::warning(this,"warnning","no brothers of sisters!");
     return;
 }
-void MemberSearch::comeFamilyManage(Tree* tr)
+void MemberSearch::comeFamilyManage(Tree* &tr_t,QString familyname)
 {
+     tr=new Tree;
+     tr=tr_t;
+     familyname=family;
 
-    tr=tr;
 }
 void MemberSearch::returnbtnSlot()
 {
@@ -147,7 +152,7 @@ Tree* MemberSearch::search(Tree *tr3, QString name) {
     queue<Tree* > q;
     if (tr3 != 0) {
         if (tr3->selfname == name)
-            return tr;
+            return tr3;
         q.push(tr);
         while (q.empty() == false ) {
             if(q.front() -> left != 0) {
@@ -178,6 +183,7 @@ void MemberSearch:: searchchidren(Tree* tr4, QString name) {
         t2=t2->leftone;
         int i=0;
         while (t2 != 0) {
+            _model->setFilter( "familyname='"+familyname+"'");
             _model->setFilter( "name='"+t2->selfname+"'");
             _model->select();
             ui->membersearchview->setModel(_model);

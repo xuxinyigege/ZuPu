@@ -1,6 +1,8 @@
 ﻿#include "memberdelete.h"
 #include "ui_memberdelete.h"
 #include "membersearch.h"
+Tree* tr;
+QString familyname;
 MemberDelete::MemberDelete(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MemberDelete)
@@ -11,20 +13,20 @@ MemberDelete::MemberDelete(QWidget *parent) :
     model=new QSqlTableModel(this);
     model->setTable("member");
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    model->setHeaderData(0,Qt::Horizontal,"name");
-    model->setHeaderData(1,Qt::Horizontal,"gender");
-    model->setHeaderData(2,Qt::Horizontal,"fathername");
-    model->setHeaderData(3,Qt::Horizontal,"islive");
-    model->setHeaderData(4,Qt::Horizontal,"address");
-    model->setHeaderData(5,Qt::Horizontal,"telnumber");
-    model->setHeaderData(6,Qt::Horizontal,"generation");
-    model->removeColumns(7,7);
+    model->removeColumns(0,0);
+    model->setHeaderData(1,Qt::Horizontal,"name");
+    model->setHeaderData(2,Qt::Horizontal,"gender");
+    model->setHeaderData(3,Qt::Horizontal,"fathername");
+    model->setHeaderData(4,Qt::Horizontal,"islive");
+    model->setHeaderData(5,Qt::Horizontal,"address");
+    model->setHeaderData(6,Qt::Horizontal,"telnumber");
+    model->setHeaderData(7,Qt::Horizontal,"generation");
     ui->memberdeleteview->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->memberdeleteview->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->delline->setPlaceholderText("请输入name");
        //连接按钮的信号和槽
-       connect(ui->delbtn,SIGNAL(clicked()),this,SLOT(delbtnSlot()));
-       connect(ui->returnbtn,SIGNAL(clicked()),this,SLOT(returnbtnSlot()));
+    connect(ui->delbtn,SIGNAL(clicked()),this,SLOT(delbtnSlot()));
+    connect(ui->returnbtn,SIGNAL(clicked()),this,SLOT(returnbtnSlot()));
 }
 void MemberDelete::delbtnSlot()
 {
@@ -34,11 +36,12 @@ void MemberDelete::delbtnSlot()
       QMessageBox::warning(this,"警告","删除输入框不能为空");
       return;
   }
+  model->setFilter( "familyname='"+familyname+"'");
   model->select();
   int i;
   for(i=0;i<model->rowCount();i++)
   {
-      if(model->data(model->index(i,0)).toString()==ui->delline->text())
+      if((model->data(model->index(i,1)).toString()==ui->delline->text())&&(model->data(model->index(i,0)).toString()==familyname))
       {
           if(QMessageBox::question(this,"提示","确定要删除吗？",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
           {
@@ -46,6 +49,7 @@ void MemberDelete::delbtnSlot()
               model->submitAll();
               deletemember(tr,ui->delline);
               ui->delline->clear();
+              ui->memberdeleteview->setModel(model);
               return;
           }
           else
@@ -62,18 +66,12 @@ void MemberDelete::returnbtnSlot()
     emit EmitToFamilyManage(tr);
     this->hide();
 }
-void MemberDelete::comeStudentManage(Tree* &tr)
+void MemberDelete::comeStudentManage(Tree* &tr_t,QString family)
 {
+    tr=new tr_t;
+    familyname=family;
 
-    model->select();
-    if(model->data(model->index(0,0)).toString().isEmpty())
-    {
-        QMessageBox::information(this,"提示","信息为空,无法删除信息",QMessageBox::Yes);
-        emit EmitToFamilyManage(tr);
-        this->hide();
-        return;
-    }
-    ui->memberdeleteview->setModel(model);
+
 }
 MemberDelete::~MemberDelete()
 {

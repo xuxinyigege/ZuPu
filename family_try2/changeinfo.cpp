@@ -2,6 +2,9 @@
 #include "ui_changeinfo.h"
 #include "membersearch.h"
 #include <QTableView>
+Tree *tr;
+QString familyname;
+QString name;
 ChangeInfo::ChangeInfo(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChangeInfo)
@@ -19,26 +22,28 @@ ChangeInfo::ChangeInfo(QWidget *parent) :
         model->setTable("member");
         model->select();
         model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-        model->setHeaderData(0,Qt::Horizontal,"name");
-        model->setHeaderData(1,Qt::Horizontal,"gender");
-        model->setHeaderData(2,Qt::Horizontal,"fathername");
-        model->setHeaderData(3,Qt::Horizontal,"islive");
-        model->setHeaderData(4,Qt::Horizontal,"address");
-        model->setHeaderData(5,Qt::Horizontal,"telnumber");
-        model->setHeaderData(6,Qt::Horizontal,"generation");
-        model->removeColumns(7,7);
+        model->removeColumns(0,0);
+        model->setHeaderData(1,Qt::Horizontal,"name");
+        model->setHeaderData(2,Qt::Horizontal,"gender");
+        model->setHeaderData(3,Qt::Horizontal,"fathername");
+        model->setHeaderData(4,Qt::Horizontal,"islive");
+        model->setHeaderData(5,Qt::Horizontal,"address");
+        model->setHeaderData(6,Qt::Horizontal,"telnumber");
+        model->setHeaderData(7,Qt::Horizontal,"generation");
+        model->setFilter( "familyname='"+familyname+"'");
         _model=new QSqlTableModel(this);
-        _model->setTable("member");
-        _model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-        _model->setHeaderData(0,Qt::Horizontal,"name");
-        _model->setHeaderData(1,Qt::Horizontal,"gender");
-        _model->setHeaderData(2,Qt::Horizontal,"fathername");
-        _model->setHeaderData(3,Qt::Horizontal,"islive");
-        _model->setHeaderData(4,Qt::Horizontal,"address");
-        _model->setHeaderData(5,Qt::Horizontal,"telnumber");
-        _model->setHeaderData(6,Qt::Horizontal,"generation");
-        _model->removeColumns(7,7);
 
+        _model->setTable("member");
+        _model->select();
+        _model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+        _model->removeColumns(0,0);
+        _model->setHeaderData(1,Qt::Horizontal,"name");
+        _model->setHeaderData(2,Qt::Horizontal,"gender");
+        _model->setHeaderData(3,Qt::Horizontal,"fathername");
+        _model->setHeaderData(4,Qt::Horizontal,"islive");
+        _model->setHeaderData(5,Qt::Horizontal,"address");
+        _model->setHeaderData(6,Qt::Horizontal,"telnumber");
+        _model->setHeaderData(7,Qt::Horizontal,"generation");
         //两个按钮信号和槽函数连接
         connect(ui->confirmbtn,SIGNAL(clicked()),this,SLOT(confirmbtnSlot()));
         connect(ui->returnbtn,SIGNAL(clicked()),this,SLOT(returnbtnSlot())) ;
@@ -50,7 +55,7 @@ ChangeInfo::ChangeInfo(QWidget *parent) :
         view->show();
         int i;
         i=view->currentIndex().row();
-        QString name=model.record(i).value("name").toString();
+        name=model.record(i).value("name").toString();
         tr1=search(tr,name);
 }
 
@@ -65,8 +70,11 @@ void ChangeInfo::inputeditSlot(QString)
         ui->teachersearchview->setModel(model);
     }
 }
-void ChangeInfo::comeFamilyManage(Tree* &tr)
+void ChangeInfo::comeFamilyManage(Tree* &tr_t,QString family)
 {
+    tr=new Tree;
+    tr=tr_t;
+    familyname=family;
 
     if(model->data(model->index(0,0)).toString().isEmpty())
     {
@@ -82,13 +90,14 @@ void TeacherChangeScore::confirmbtnSlot()
     if(model->submitAll())
     {
         QMessageBox::information(this,"提示","修改成功",QMessageBox::Yes);
+        _model->setFilter( "familyname='"+familyname+"'");
         _model->setFilter( "name='"+name+"'");
-        tr1->selfname=model.record(0).value("name").toString();
-        tr1->gender=model.record(0).value("gender").toString();
-        tr1->fathername=model.record(0).value("fathername").toString();
-        tr1->telnum=model.record(0).value("telnumber").toString();
-        tr1->address=model.record(0).value("address").toString();
-        tr1->generation=model.record(0).value("name").toInt();
+        tr1->selfname=_model.record(0).value("name").toString();
+        tr1->gender=_model.record(0).value("gender").toString();
+        tr1->fathername=_model.record(0).value("fathername").toString();
+        tr1->telnum=_model.record(0).value("telnumber").toString();
+        tr1->address=_model.record(0).value("address").toString();
+        tr1->generation=_model.record(0).value("name").toInt();
     }
     else
     {

@@ -1,20 +1,20 @@
 #include "memberinsert.h"
 #include "ui_memberinsert.h"
 #include "membersearch.h"
+Tree *tr;
+QString familyname;
 MemberInsert::MemberInsert(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MemberInsert)
 {
     ui->setupUi(this);
 
-    Tree *tr;
-    tr=new Tree;
-    int generation;
+
+    //int generation;
     model=new QSqlTableModel(this);
     model->setTable("member");
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    model->removeColumns(7,7);
-
+    model->removeColumns(0,0);
 
     ui->nameline->setPlaceholderText("请输入name");
     ui->genderline->setPlaceholderText("请输入gender");
@@ -94,6 +94,7 @@ void MemberInsert::confirmbtnSlot()
 {
         if(!this->judgeEmpty())
             return;
+        model->setFilter( "familyname='"+familyname+"'");
         model->select();
         int i;
         for(i=0;i<model->rowCount();i++)
@@ -123,6 +124,7 @@ void MemberInsert::confirmbtnSlot()
         else
         {
             QSqlRecord record=model->record();
+            record.setValue("familyname",familyname);
             record.setValue("gender",ui->genderline->text());
             record.setValue("name",ui->nameline->text());
             record.setValue("islive",ui->isliveline->text());
@@ -138,15 +140,18 @@ void MemberInsert::confirmbtnSlot()
             }
          }
 }
-void MemberInsert::comeFamilyManage(Tree *&tr)
+void MemberInsert::comeFamilyManage(Tree *&tr_t,QString family)
 {
-    return;
+    tr=new Tree;
+    tr=tr_t;
+    familyname=family;
 }
 
 Tree* MemberInsert::insert(Tree* tr) {
     Tree* t;
     Tree* insert;
     insert = new Tree;
+    int generation;
     t = search(tr,ui->fathernameline->text());
     if (t != 0) {
     insert->selfname=ui->nameline->text();
