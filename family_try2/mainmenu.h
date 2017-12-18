@@ -5,30 +5,36 @@
 #include <QPalette>
 #include <QButtonGroup>
 #include <QMessageBox>
-#include "familychoose.h"
 #include "creatfamily.h"
+#include "familychoose.h"
 namespace Ui {
-class MainMenu;
+class mainmenu;
 }
 
-class MainMenu : public QWidget
+class mainmenu : public QDialog
 {
     Q_OBJECT
+
 public:
-    explicit MainMenu(QWidget *parent=0);
-    ~MainMenu();
-private:
-    Ui::MainMenu  *ui;
-   // QButtonGroup  *radiogroup;
-    CreatFamily   *familycreat;
-    FamilyChoose  *familychoose;
+    explicit mainmenu(QWidget *parent = 0);
+    ~mainmenu();
+
 signals:
     void  toCreatFamily();
+
     void  toFamilyChoose();
+
 private slots:
-    void creatbtnSlot();
-    void managebtnSlot();
-    void exitbtnSLot();
+    void on_exitbtn_clicked();
+
+    void on_creatbtn_clicked();
+
+    void on_managebtn_clicked();
+
+private:
+    Ui::mainmenu *ui;
+    creatfamily *creat;
+
 };
 
 #endif // MAINMENU_H

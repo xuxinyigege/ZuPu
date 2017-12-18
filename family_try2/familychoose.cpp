@@ -3,20 +3,21 @@
 #include <QVBoxLayout>
 #include <QTextStream>
 #include <QFile>
-FamilyChoose::FamilyChoose(QWidget *parent) :
+#include <QLineEdit>
+familychoose::familychoose(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::FamilyChoose)
+    ui(new Ui::familychoose)
 {
     ui->setupUi(this);
-    model=new QSqlTableModel(this);
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-   
+    //model=new QSqlTableModel(this);
+    //model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
     this->setWindowTitle("Family Choose");
-   
+
     //设置登录对话框大小固定为399*252
     this->setMaximumSize(399,252);
     this->setMinimumSize(399,252);
-    
+
     ui->familynameline->setPlaceholderText("请输入family name");
     //connect(ui->familynameline,SIGNAL(clicked()),this,SLOT(familynamebtnSlot()));
     connect(ui->returnbtn,SIGNAL(clicked()),this,SLOT(returnbtnSlot()));
@@ -24,12 +25,16 @@ FamilyChoose::FamilyChoose(QWidget *parent) :
     connect(ui->exitbtn,SIGNAL(clicked()),this,SLOT(exitbtnSlot()));
 }
 
-FamilyChoose::~FamilyChoose()
+familychoose::~familychoose()
 {
     delete ui;
 }
+void familychoose::comeMainMenu()
+{
 
-void FamilyChoose::confirmbtnSlot()
+}
+
+void familychoose::confirmbtnSlot()
 {
     if(!this->judgeEmpty())
     {
@@ -37,36 +42,39 @@ void FamilyChoose::confirmbtnSlot()
         return;
     }
     QString s;
-    s=ui->familynameline->text();
-    s+=".txt";
-    QFile file(s);
+     ui->familynameline->text();
+
+    s="/home/xuxinyigege/文档/family_again/"+s+".txt";
+    QFile file("/home/xuxinyigege/文档/family_again/a.txt");
     if(file.exists())
     {
-        this->clearAll();
-        familymanage=new FamilyManage;
-        familymanage->show();
-        connect(this,SIGNAL(toFamilyManage(ui->familynameline->text()),familymanage,SLOT(comeMainMenu()));
-        connect(familymanage,SIGNAL(toMainMenu()),this,SLOT(showNormal()));
-        emit toFamilyManage(ui->familynameline->text());
-        this->clearAll();
-        this->hide();
+        Tree *tr;
+        tr=new Tree;
+        _familymanage=new familymanage(this);
+        _familymanage->exec();
+        connect(this,SIGNAL(toFamilyManage(Tree *&,QString)),_familymanage,SLOT(comefamilychoose(Tree *&,QString)));
+
+        emit toFamilyManage(tr,ui->familynameline->text());
+        ui->familynameline->clear();
+        done(Accepted);
+       // this->hide();
         return;
-    } 
+    }
     else
     {
         QMessageBox::information(this,"提示","No This Family",QMessageBox::Yes);
-        this->clearAll();
+        ui->familynameline->clear();
         return;
     }
 }
-void FamilyChoose::returnbtnSlot()
+void familychoose::returnbtnSlot()
 {
-    
+
      emit toMainMenu();
      delete this;
-       
+
 }
-void FamilyChoose::exitbtnSlot()
+void familychoose::exitbtnSlot()
 {
     if(QMessageBox::question(this,"提示","是否退出系统?",QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
     {
@@ -74,12 +82,12 @@ void FamilyChoose::exitbtnSlot()
         delete this;
     }
 }
-bool FamilyChoose::judgeEmpty()
+bool familychoose::judgeEmpty()
 {
     if(ui->familynameline->text().isEmpty()){
         QMessageBox::warning(this,"警告","名不能为空");
         return false;
     }
-    else 
+    else
         return true;
 }

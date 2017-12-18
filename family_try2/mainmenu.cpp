@@ -2,49 +2,49 @@
 #include "ui_mainmenu.h"
 #include "creatfamily.h"
 #include "familychoose.h"
-#include <QVBoxLayout>
 
-MainMenu::MainMenu(QWidget *parent):
-    QWidget(parent),
-    ui(new Ui::MainMenu)
+mainmenu::mainmenu(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::mainmenu)
 {
     ui->setupUi(this);
-    
     this->setMaximumSize(822,583);
     this->setMinimumSize(822,583);
-
     this->setWindowTitle("Family Geneology System");
-   /* radiogroup=new QButtonGroup(this);
-    radiogroup->addButton((ui->creatradio,0));
-    radiogroup->addButton((ui->manageradio,1));*/
-    
-    connect(ui->creatbtn,SIGNAL(clicked()),this,SLOT(creatbtnSlot()));
-    connect(ui->managebtn,SIGNAL(clicked()),this,SLOT(managebtnSlot()));
-    
+
+    //连接学生成绩管理窗口和登录对话框信号与槽
+    connect(ui->creatbtn,SIGNAL(clicked()),this,SLOT(on_creatbtn_clicked()));
+   // connect(ui->managebtn,SIGNAL(clicked()),this,SLOT(on_managebtn_clicked()));
+
 }
-MainMenu::~MainMenu()
+
+mainmenu::~mainmenu()
 {
     delete ui;
 }
-void MainMenu::creatbtnSlot()
+
+void mainmenu::on_exitbtn_clicked()
 {
-    familycreat=new CreatFamily;
-    connect(familycreat,SIGNAL(toCreatFamily),this,SLOT(showNormal());
-    familycreat->show();
-    emit toCreatFamily();
-    this->hide();
-    return;
+    close();
 }
-void MainMenu::managebtnSlot()
+
+void mainmenu::on_creatbtn_clicked()
 {
-    familymanage=new FamilyChoose;
-    connect(familymanage,SIGNAL(toFamilyChoose),this,SLOT(showNormal());
-    familymanage->show();
+   creat = new creatfamily(this);
+   creat->exec();
+
+   connect(this,SIGNAL(toCreatFamily()),creat,SLOT(comeMainMenu()));
+   emit toCreatFamily();
+
+   return;
+}
+
+
+void mainmenu::on_managebtn_clicked()
+{
+    familychoose *choosefamily = new familychoose(this);
+    choosefamily->exec();
+    connect(this,SIGNAL(toFamilyChoose()),choosefamily,SLOT(comeMainMenu()));
     emit toFamilyChoose();
-    this->hide();
     return;
-}
-void MainMenu::exitbtnSlot()
-{
-    this->close();
 }

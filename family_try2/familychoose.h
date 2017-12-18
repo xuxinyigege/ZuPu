@@ -1,35 +1,39 @@
-#ifndef FAMILYCHOOSE_H
-#define FAMILYCHOOSE_H
+#ifndef familychoose_H
+#define familychoose_H
 #include "familymanage.h"
 #include "mainmenu.h"
 #include <QDialog>
 #include <QDebug>
+#include <QWidget>
 #include <QPalette>
 #include <QButtonGroup>
 #include <QMessageBox>
+#include "tree.h"
 namespace Ui {
-class FamilyChoose;
+class familychoose;
 }
 
-class FamilyChoose : public QDialog
+class familychoose : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit FamilyChoose(QWidget *parent = 0);
-    ~FamilyChoose();
+    explicit familychoose(QWidget *parent = 0);
+    ~familychoose();
     void clearAll();
     bool judgeEmpty();
 private:
-    Ui::FamilyChoose *ui;
-    FamilyManage *familymanage;
+    Ui::familychoose *ui;
+    familymanage *_familymanage;
 signals:
-    void toFamilyManage(QString);
+    void toFamilyManage(Tree *&,QString);
     void toMainMenu();
 private slots:
     void returnbtnSlot();
     void confirmbtnSlot();
     void exitbtnSlot();
+public slots:
+    void comeMainMenu();
 };
 
-#endif // FAMILYCHOOSE_H
+#endif // familychoose_H
